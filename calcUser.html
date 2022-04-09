@@ -1,0 +1,38 @@
+<html>
+	<head>
+		<title> Calc User</title>
+		<script src="calcMaker.js"></script>
+	</head>
+	
+	<body>
+		<textarea id="calcSpecInput">
+			
+		</textarea>
+		<button onclick="javascript:loadCalc()">Load Calculator</button><br>
+		<div id="target"></div>
+		<script>
+			let calcSpec = null;
+			function loadCalc() {
+				// Not sure why value works and textContent doesn't. Did not loko up.
+				calcSpec = JSON.parse(document.getElementById("calcSpecInput").value);
+				
+				// Note that formula pieces is modified.
+				const generated = makeCalc(calcSpec.title, calcSpec.formula);
+				console.log(generated);
+				document.getElementById('target').innerHTML = generated;
+
+				document.getElementById('computeAnswerButton').style = "display: block";
+				// In case we load a different formula we don't want to display the answer to the old formula (looks weird).
+				document.getElementById('answerTarget').style = "display: none"
+			}
+			
+			function computeAnswer() {
+				document.getElementById('answerTarget').innerHTML = getFormattedAnswer(calcSpec.formula, calcSpec.answerTemplate);
+				document.getElementById('answerTarget').style = "display: block"
+			}
+			 
+			</script>
+			<div id="answerTarget" style="display:none"></div>
+			<button id="computeAnswerButton" style="display:none" onclick="javascript:computeAnswer()">Compute Answer</button>
+	</body>
+</head>
