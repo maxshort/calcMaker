@@ -9,9 +9,7 @@
 			let currentEquation = []
 		
 			//TODO: It would be cool to make a div pattern swapper or something for the show/hidden divs...
-		
-			//TODO: We should have a quick editor where we show the raw JSON for faster editing...
-		
+
 			// "Render"
 			function makeCurrentEquation() {
 				if (currentEquation.length == 0) {
@@ -19,7 +17,7 @@
 					document.getElementById('accumulatedEquationTarget').style = "display: none";
 				} else {
 					document.getElementById('noEquationMessage').style = "display: none";
-					const generated = makeCalc(null, currentEquation);
+					const generated = makeCalc(document.getElementById('calcTitle').value, currentEquation);
 					document.getElementById('accumulatedEquationTarget').innerHTML = generated;
 					document.getElementById('accumulatedEquationTarget').style = "display: block";
 				}
@@ -30,53 +28,6 @@
 					"formula": currentEquation
 				}
 				document.getElementById('rawEquation').textContent = JSON.stringify(fullExport);
-			}
-
-			// If not show numbers, show operators
-			function showAddNumbers(showNumbers) {
-				const showIt = "display: block";
-				const dontShow = "display: none";
-				document.getElementById('addNumbers').style = showNumbers ? showIt : dontShow;
-				document.getElementById('addOperator').style = showNumbers ? dontShow : showIt;
-			}
-
-			function getSelectedNumberKind() {
-				return document.getElementById('numberKindSelect').selectedOptions[0].id
-			}
-
-			function toggleUserInputLabel() {
-				const selectedId = getSelectedNumberKind();
-				if (selectedId == "userInputOption") {
-					document.getElementById('inputSub').style = "display: block"
-					document.getElementById('constantSub').style = "display: none"
-				} else if (selectedId == "constantOption") {
-					document.getElementById('constantSub').style = "display: block"
-					document.getElementById('inputSub').style = "display: none"
-				} else {
-					// PRobably not the best practice in a real app
-					throw "Unrecognized toggle id: " + selectedId;
-				}
-			}
-			
-			function addClicked() {
-				// We have a number
-				if (currentEquation.length %2 == 0) {
-					const selectedId = getSelectedNumberKind();
-					if (selectedId == "userInputOption") {
-						currentEquation.push(serializeUserInput(document.getElementById("currentInput").value));
-					} else if (selectedId == "constantOption"){
-						currentEquation.push(serializeConstant(document.getElementById("currentConstant").value));
-					} else {
-						throw "Unrecognized selectedId: " + selectedId;
-					}
-				} else { // We have an operator
-					currentEquation.push(serializeOperator(document.getElementById('operatorSelect').selectedOptions[0].value ));
-				}
-				makeCurrentEquation();
-				// This is the "current" current equaiton - after the latest piece has been added.
-				const showNumbers = currentEquation.length % 2 == 0;
-				showAddNumbers(showNumbers);
-				
 			}
 			
 			let showRawEquation = false;
@@ -91,51 +42,40 @@
 					document.getElementById('toggleRawEquation').textContent = 'Show Raw Accumulated Equation';
 				}
 			}
+			
+			function insertNewEq() {
+				//Idea: In the future, we could differentiate between a complete equation or not
+				// and then show the preview but not allow export of an incomplete equation.
+				currentEquation = fromString(document.getElementById('expBox').value);
+				console.log("Current equation to be created: ", currentEquation);
+				makeCurrentEquation();
+			}
 		</script>
-		<h2>Your calculator so far</h2>
-		<h3>Accumulated Equation</h3>
-		
+
+
+		<h2>Add to / edit your calculator </h2>
+		<label for="calcTitle" >Calc title: </label><input id="calcTitle" value="My Calculator"/><br>
+		<label for="answerTemplate">Answer Template: </label><input id="answerTemplate" value="%a" />	
+		<BR>
+		<div>
+		<br>
+		Enter your equation below. You can use numbers and standard arithmetic operators (+,-,*,/). To make a user input field, type the fields name, followed by a colon and then a question mark. Example -- `3 + my_input: ?`. Note: An equation is only valid for export if it does not end in an operator.
+		<br><br>
+		</div>
+		<textarea id="expBox" oninput="javascript: insertNewEq()"></textarea>
+		<br><br><br>
 		<div id="noEquationMessage">
 			(No equation pieces added yet)
 		</div>
 		<div id="accumulatedEquationTarget">
 			
 		</div>
-		<button id="toggleRawEquation" onclick="javascript:toggleShowEquation()">Show Raw Accumulated Equation</button>
+		<br><br><br>
+		<button id="toggleRawEquation" onclick="javascript:toggleShowEquation()">Export</button>
 		<div id="rawEquationSection" style="display: none">
-			<h3>Raw accumulated equation</h3>
-			<textarea id="rawEquation" readonly=true>
+			<textarea id="rawEquation" readonly=true style="width: 300px; height: 150px">
 			
 			</textarea>
 		</div>
-		<h2>Add to / edit your calculator </h2>
-		<label for="calcTitle" >Calc title: </label><input id="calcTitle" value="My Calculator"/><br>
-		<label for="answerTemplate">Answer Template: </label><input id="answerTemplate" value="%a" />
-		<h3> Add an equation element </h3>
-		<div id="addNumbers">
-			<label for="numberKindSelect">User entered or constant number: </label>
-			<select id="numberKindSelect" onchange="javascript:toggleUserInputLabel()">
-				<option id="userInputOption">User Input Field</option>
-				<option id="constantOption">Constant</option>
-			</select>
-			<!--TODO: Do we need fresh ids at least for the thigns people input -->
-			<div id="inputSub">
-				<label for="currentInput">Label for user input: </label><input id="currentInput"/>
-			</div>
-			<div id="constantSub" style="display: none">
-				<label for="currentConstant">Constant value: </label><input id="currentConstant" />
-			</div>
-		</div>
-		<div id="addOperator" style="display: none">
-			<select id="operatorSelect">
-				<option>+</option>
-				<option>-</option>
-				<option>/</option>
-				<option>*</option>
-			</select>
-		</div>
-		
-		<button onclick="javascript:addClicked()">Add</button>		
-		
 	</body>
 </html>

@@ -22,9 +22,6 @@ const PHASE_2_OPERATORS = ["+", "-"];
 // {type: "constant", value: "4"}
 // {type: "user_input", value: null, label: "Your input 1"}  // Can have a nullable value
 
-
-//TODO: A quick templating langauge for "Advanced users" that's automatically updated at the bottom of the screen could be cool.
-
 function makeOperator(operatorPiece) {
 	return operatorPiece.value;
 }
@@ -42,7 +39,7 @@ function serializeOperator(operatorValue) {
 }
 
 // Not idempotent, tacks on a valueResolver...
-function makeUserInput(inputPiece) {
+function makeUserInput(inputPiece, withInput=false) {
 	const rId = "rid" + Math.random().toString().substring(2);
 	// + is the unary conversion operator
 	inputPiece.valueResolver = () => +(document.getElementById(rId).value);
@@ -57,7 +54,7 @@ function makeConstant(constantPiece) {
 
 // Answer templates are returned as is except %a is replaced with the answer
 // There is no 
-// A null answer template just returns the answer TODO: Doesn't JS have default args?
+// A null answer template just returns the answer
 function makeFormattedAnswer(template, answer) {
 	if(!template) {
 		template = "%a";
@@ -112,7 +109,6 @@ function getAnswer(formulaPieces) {
 				formulaPieces.slice(0, i - 1)
 				.concat({"type": CONSTANT, "value": subAnswer, "valueResolver": () => subAnswer})
 				.concat(formulaPieces.slice(i+2)))
-			//TODO: figure out where to return from ... here, right?
 		}
 	}
 	// At  this point, no mult or division...
@@ -138,4 +134,97 @@ function performOperation(value1, operator, value2) {
 		default:
 			throw "Unrecognized operator: " + operator
 	}
+}
+
+function fromString(s) {
+	// Go to first colon -- that's a label. + question mark for textbox are made together
+	// operator
+	// (repeat)
+	
+	formulaPieces = []
+	while (s.trim().length > 0) {
+		var constToAddPair = consumeConstant(s);
+		if (constToAddPair != null) {
+			[constToAdd, s] = constToAddPair;
+			formulaPieces.push(constToAdd)
+		} else {
+			var labelToAddPair = consumeLabel(s);
+			if (labelToAddPair != null ) {
+				[labelToAdd, s] = labelToAddPair;
+				formulaPieces.push(labelToAdd);
+			} else { // If neither const or user input are present, formula is invalid from here on...
+				break;
+			}	
+		}
+		var opToAddPair = consumeOperator(s);
+		console.log("OP TO ADD PAIR: ", opToAddPair);
+		if (opToAddPair == null) {
+			break;
+		}
+		[opToAdd, s] = opToAddPair;
+		formulaPieces.push(opToAdd);
+	}
+	console.log("FORMULA PIECES", formulaPieces);
+	return formulaPieces;
+	//return makeCalc("no title", formulaPieces);
+	
+}
+
+// In all of these, returned string may have leading whitespace...
+
+// TODO: Would be nice to have some kind of error checking...
+
+// It's a constant if it parses as a number (with only whitespace) before next constant or end of string.
+// Could probably regex that.
+function consumeConstant(s) {
+	m = s.match(/^\s*(\d+)\s*/);
+	if (!m) {
+		return null;
+	}
+	number = +m[1]
+	consumedLen = m[0].length;
+	return [serializeConstant(number), s.slice(consumedLen)];
+}
+
+// Consumes all the way up to a colon:, then returns (parsed, remaining str).
+function consumeLabel(s) {
+	colonIdx = s.indexOf(":");
+	if (colonIdx == -1) {
+		return null;
+	}
+	// For now, next character must be a question mark...in the future it might be slick to type label without box, type ?, see box...
+	// We'll consider it "not complete" if ? is not there...
+	questionMarkIdx = s.indexOf("?", colonIdx)
+	if (questionMarkIdx == -1) {
+		return null;
+	}
+	label = s.slice(0, colonIdx);
+	remaining = s.slice(questionMarkIdx + 1);
+	return [serializeUserInput(label), remaining]
+}
+
+function consumeOperator(s) {
+	// Funky b/c of escapes but just the 4 arithmetic operators surrounded by whitespace.
+	m = s.match(/^\s*(\+|-|\*|\/)\s*/);
+	if (m == null) {
+		return null;
+	}
+	op = serializeOperator(m[1]);
+	consumedLen = m[0].length;
+	return [op, s.slice(consumedLen)];
+}
+
+// One problem if we have it simultaneously updating -- we couldn't preserve user whitespace...
+function formulaToString(pieces) {
+	return pieces.map(formulaPiece => {
+		switch(formulaPiece.type) {
+			case OPERATOR:
+				return formulaPiece.value;
+			case CONSTANT:
+				return formulaPiece.value;
+			case USER_INPUT:
+				return (formulaPiece.label + ": ?");
+			default: throw "Unrecognized formula piece: " + JSON.stringify(formulaPiece);
+	}}).join(" ");
+	
 }
