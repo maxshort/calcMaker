@@ -43,7 +43,17 @@ function makeUserInput(inputPiece, withInput=false) {
 	const rId = "rid" + Math.random().toString().substring(2);
 	// + is the unary conversion operator
 	inputPiece.valueResolver = () => +(document.getElementById(rId).value);
-	return `<label for="${rId}">${inputPiece.label}</label><input id="${rId}" type=number />`
+	return `<label for="${rId}">${inputPiece.label}</label>: ${makeAdjustableNumberInput(rId)}`
+}
+
+function updateBoxWidth(box) {
+	numPx = 30 + 8 * box.value.length;
+	box.style.width = numPx + "px";
+}
+
+function makeAdjustableNumberInput(id) {
+	// there's prob. a cleaner way then looking up the id...
+	return `<input id="${id}" type=number style="width: 30px" oninput="updateBoxWidth(document.getElementById('${id}'))">`;
 }
 
 // valueResolver added here too for consistency / ergonomics later.
