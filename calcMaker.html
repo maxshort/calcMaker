@@ -7,8 +7,6 @@
 	<body>
 		<script>
 			let currentEquation = []
-		
-			//TODO: It would be cool to make a div pattern swapper or something for the show/hidden divs...
 
 			// "Render"
 			function makeCurrentEquation() {
@@ -36,10 +34,10 @@
 				const equationSection = document.getElementById('rawEquationSection')
 				if (showRawEquation) {
 					equationSection.style = 'display: block';
-					document.getElementById('toggleRawEquation').textContent = 'Hide raw equation';
+					document.getElementById('toggleRawEquation').textContent = 'Hide Export';
 				} else {
 					equationSection.style= 'display: none';
-					document.getElementById('toggleRawEquation').textContent = 'Show Raw Accumulated Equation';
+					document.getElementById('toggleRawEquation').textContent = 'Export';
 				}
 			}
 			
@@ -77,5 +75,6 @@
 			
 			</textarea>
 		</div>
+
 	</body>
 </html>
