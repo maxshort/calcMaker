@@ -1,15 +1,3 @@
-// "Phase 2" Ideas
-//  - Generally format it much nicer...
-//    - ON display -- could separate the formula stuff from the display?? Or make the text optionally show up?
-//		- There's too much visual noise to read the formula...
-//  	- Prob. need to draw this on paper.
-//  - Put the new (operator,constant etc.) dialog in line with the formula
-//  - Edit existing equation -- load it into the CalcMaker.html - 
-//    - be able to delete elements of an equation / insert at arbitrary points -- the way it exists now, we'd have to
-//      make them delete an operator and equation element at the same time.
-//  - Explore outputting html code.
-//  - Do an expalnation mode where it works stuff down one by one...
-
 const OPERATOR = "operator";
 const CONSTANT = "constant";
 const USER_INPUT = "user_input";
@@ -17,10 +5,6 @@ const USER_INPUT = "user_input";
 //Set would probably be better?
 const PHASE_1_OPERATORS = ["/", "*"];
 const PHASE_2_OPERATORS = ["+", "-"];
-
-// {type: "operator", value: "+"}
-// {type: "constant", value: "4"}
-// {type: "user_input", value: null, label: "Your input 1"}  // Can have a nullable value
 
 function makeOperator(operatorPiece) {
 	return operatorPiece.value;
@@ -99,8 +83,6 @@ function getFormattedAnswer(formulaPieces, answerTemplate) {
 }
 
 function getAnswer(formulaPieces) {
-	console.log("FORMP", formulaPieces);
-
 	// Should always have either an answer or number, op, number (with op, number after)
 	if (formulaPieces.length %2 == 0) {
 		throw "Formula pieces was even" + JSON.stringify(formulaPieces);
@@ -127,7 +109,6 @@ function getAnswer(formulaPieces) {
 }
 
 function performOperation(value1, operator, value2) {
-	console.log("OPERATION", value1, value2);
 	switch(operator) {
 		case '+':
 			return value1 + value2;
@@ -167,14 +148,12 @@ function fromString(s) {
 			}	
 		}
 		var opToAddPair = consumeOperator(s);
-		console.log("OP TO ADD PAIR: ", opToAddPair);
 		if (opToAddPair == null) {
 			break;
 		}
 		[opToAdd, s] = opToAddPair;
 		formulaPieces.push(opToAdd);
 	}
-	console.log("FORMULA PIECES", formulaPieces);
 	return formulaPieces;
 	//return makeCalc("no title", formulaPieces);
 	

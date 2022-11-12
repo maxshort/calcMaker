@@ -45,7 +45,6 @@
 				//Idea: In the future, we could differentiate between a complete equation or not
 				// and then show the preview but not allow export of an incomplete equation.
 				currentEquation = fromString(document.getElementById('expBox').value);
-				console.log("Current equation to be created: ", currentEquation);
 				makeCurrentEquation();
 			}
 		</script>
@@ -57,7 +56,13 @@
 		<BR>
 		<div>
 		<br>
-		Enter your equation below. You can use numbers and standard arithmetic operators (+,-,*,/). To make a user input field, type the fields name, followed by a colon and then a question mark. Example -- `3 + my_input: ?`. Note: An equation is only valid for export if it does not end in an operator.
+		Enter your equation below. You can use numbers and standard arithmetic operators (+,-,*,/). To make a user input field, type the field's name, followed by a colon and then a question mark.
+		<br><br>
+		Example equations (try pasting into the box below):
+		<ul>
+			<li><pre>3 + my input: ?</pre></li>
+			<li><pre>two pointers: ? * 2 + three pointers: ? * 3</pre></li>
+		</ul>
 		<br><br>
 		</div>
 		<textarea id="expBox" oninput="javascript: insertNewEq()"></textarea>
