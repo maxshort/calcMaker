@@ -166,11 +166,11 @@ function fromString(s) {
 // It's a constant if it parses as a number (with only whitespace) before next constant or end of string.
 // Could probably regex that.
 function consumeConstant(s) {
-	m = s.match(/^\s*(\d+)\s*/);
+	m = s.match(/^\s*(\d+)(\.(\d+))?\s*/);
 	if (!m) {
 		return null;
 	}
-	number = +m[1]
+	number = +m[0]
 	consumedLen = m[0].length;
 	return [serializeConstant(number), s.slice(consumedLen)];
 }
